@@ -1,6 +1,21 @@
 var cheerio = require('cheerio');
 var fs = require('fs');
 
+
+datafiles = fs.readdirSync('./lexingtonma');
+
+for (var i = 1; i < datafiles.length; i++) {
+	contents = fs.readFileSync('./lexingtonma/'+datafiles[i], 'utf8');
+	//var $ = cheerio.load(contents);
+	//$('.mealgroup.breakfast #bakery-station ul .item-menu-name').each(function(object) {
+//		//console.log($(this).text());
+//		station.items.push($(this).text())
+//	});
+
+}
+/*
+
+
 var addressData = {}
 var input = fs.createReadStream('output.txt');
 readLines(input, parseData);
@@ -45,8 +60,9 @@ function parseData(data) {
 function SortData(addressData) {
 	var addresses = Object.keys(addressData);
 	var streetNames = Object.keys(addressData);
+
 	function streetArrayElements(element, index, array) {
-  		streetNames[index] = element
+		streetNames[index] = element
 	}
 
 	streetNames.forEach(streetArrayElements);
@@ -73,3 +89,4 @@ function SortData(addressData) {
 	for (var i = 0; i < addresses.length; i++)
 		console.log(addresses[i] + ": " + addressData[addresses[i]])
 }
+*/
