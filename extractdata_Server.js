@@ -1,32 +1,73 @@
+var http = require('http');
+
 var fs = require('fs');
 
 //cheerio for parsing html DOM
 var cheerio = require('cheerio');
 
-datafiles = fs.readdirSync('./lexingtonma');
+//datafiles = fs.readdirSync('./lexingtonma');
 
 
 //iterate over each property which is stored in a unique file
 
 //Start at index 1 because first is .file
-for (var i = 1; i < datafiles.length; i++) {
-	contents = fs.readFileSync('./lexingtonma/' + datafiles[i], 'utf8');
-	var $ = cheerio.load(contents);
-	var heatingType = $('td').map(function() {
-		if ($(this).text() === 'Heat Fuel') {
-			return $(this).next().text();
+
+/*
+	Main() 
+	-->URL
+	^ Scraper 
+ url|	-->HTML
+	|		Parser
+DB<--Data<--
+
+*/
+
+
+var incomplete = true;
+var counter = 0;
+var next = true;
+while (incomplete) {
+	if (next == true) {
+		callback = function(response) {
+			var str = '';
+
+			//another chunk of data has been recieved, so append it to `
+			//str 
+			response.on('error', function(chunk) {
+				counter++;
+				next = true;
+			});
+			response.on('data', function(chunk) {
+				str += chunk;
+			});
+
+			//the whole response has been recieved, so we just print it out here
+			response.on('end', function() {
+				var $ = cheerio.load(str);
+				var heatingType = $('td').map(function() {
+					if ($(this).text() === 'Heat Fuel') {
+						return $(this).next().text();
+					}
+				});
+
+				if (heatingType == undefined)
+					heatingType = "UNKNOWN";
+
+
+				if ($('#MainContent_lblAddr1').html() != null)
+					var address = $('#MainContent_lblAddr1').html().replace("<br>", " ");
+
+				console.log(address + ' ' + heatingType);
+			});
 		}
-	});
-	
-	if (heatingType ==undefined)
-		heatingType = "UNKNOWN";
 
+		http.request('http://gis.vgsi.com/lexingtonma/Parcel.aspx?pid=' + counter, callback).end();
+	}
 
-
-	var address = $('#MainContent_lblAddr1').html().replace("<br>", " ");
-
-	console.log(address + ' ' +heatingType);
 }
+
+
+
 /*
 
 
